@@ -7,11 +7,11 @@ class Main
     @frames = frames
     @rolls = @frames.flatten
     @max_attempts = CONFIG[:max_attempts]
+
+    validate()
   end
 
   def score
-    validate()
-    
     total = 0
     index = 0
 
@@ -33,10 +33,33 @@ class Main
 
   private
     def validate
-      raise ArgumentError, "Collection can't be empty!" unless @frames.size > 0
-      raise ArgumentError, "Collection should has 10 data either single or set of number!" unless @frames.size == @max_attempts 
-      raise ArgumentError, "Collection contains non-integer elements!" unless @rolls.all? { |n| n.is_a?(Integer) }
+      raise ArgumentError, LABEL[:collection_cant_be_empty] unless frame_must_be_greater_than_zero
+      raise ArgumentError, LABEL[:collection_must_be_ten] unless frame_must_be_ten_data 
+      raise ArgumentError, LABEL[:collection_must_has_all_numbers] unless frame_must_has_all_numbers
+      raise ArgumentError, LABEL[:collection_contains_more_than_two_pairs] unless frame_contains_more_than_two_pairs_except_last 
     end
+
+    ######## Validation ########
+
+    def frame_must_be_greater_than_zero 
+      @frames.size > 0
+    end
+
+    def frame_must_be_ten_data
+      @frames.size == @max_attempts
+    end
+
+    def frame_must_has_all_numbers
+      @rolls.all? { |n| n.is_a?(Integer) } 
+    end
+
+    def frame_contains_more_than_two_pairs_except_last
+      @frames[0...-1].all? { |frame| frame.is_a?(Array) && frame.length <= 2 } && 
+      @frames.last.is_a?(Array) && 
+      @frames.last.length == 3 
+    end
+
+    ######## Score Calculation ########
 
     def strike?(i)
       roll(i) == @max_attempts
