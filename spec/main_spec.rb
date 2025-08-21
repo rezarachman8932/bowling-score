@@ -28,9 +28,42 @@ RSpec.describe Main do
     expect(game.score).to eq(70)
   end
 
-  it 'handles edge case: empty game' do
+  it 'throw an error when the frames is empty' do
     frames = []
-    game = Main.new(frames)
-    expect(game.score).to eq(0)
+    error = nil
+    begin
+      game = Main.new(frames)
+      game.score
+    rescue => e
+      error = e
+    end
+    expect(error).to be_a(ArgumentError)
+    expect(error.message).to eq("Collection can't be empty!")
+  end
+
+  it 'throw an error when the frames contains less than 10 data' do
+    frames = [[5,3], [10,10,10]]
+    error = nil
+    begin
+      game = Main.new(frames)
+      game.score
+    rescue => e
+      error = e
+    end
+    expect(error).to be_a(ArgumentError)
+    expect(error.message).to eq("Collection should has 10 data either single or set of number!")
+  end
+
+  it 'throw an error when the collection has at least one non-integer' do
+    frames = [[5,3], [10], [4,'a'], [3,false], [10], [10], [5,5], [0,10], [10], [10,10,10]]
+    error = nil
+    begin
+      game = Main.new(frames)
+      game.score
+    rescue => e
+      error = e
+    end
+    expect(error).to be_a(ArgumentError)
+    expect(error.message).to eq("Collection contains non-integer elements!")
   end
 end
